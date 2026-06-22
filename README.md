@@ -1,140 +1,40 @@
-# WeekPlanner 📅
+# 🗺️ Projeto 04 — Cloud Data Architecture & Serverless Web App: WeekPlanner T1 Topografia
 
-Aplicação web de planejamento semanal e gestão de tarefas com visualização por membros da equipe.
-
-## Stack
-
-| Camada      | Tecnologia            |
-|-------------|----------------------|
-| Frontend    | HTML5 · CSS Grid · Vanilla JS |
-| Backend     | Python 3.12 + FastAPI |
-| Banco       | PostgreSQL 16         |
-| Infra       | Docker + Docker Compose |
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Concluído-1A9C3E?style=for-the-badge)
 
 ---
 
-## Início rápido — com Docker (recomendado)
+## 📌 Sobre o Projeto
 
-```bash
-# 1. Clone / extraia o projeto
-cd weekplanner
+Este projeto prático consistiu no desenvolvimento de uma aplicação web completa (Full-Stack) voltada para a gestão de agendamentos e acompanhamento de pendências operacionais de uma equipe técnica de topografia.
 
-# 2. Suba tudo
-docker compose up --build
-
-# 3. Acesse
-open http://localhost        # Frontend
-open http://localhost:8000/docs  # Swagger UI da API
-```
-
-O PostgreSQL é inicializado automaticamente com o schema e seed data.
+O objetivo principal foi substituir controles locais isolados por uma **arquitetura de dados centralizada em nuvem (Serverless)**. A aplicação atua como a principal fonte de ingestão de dados de campo, estabelecendo uma fundação relacional sólida e íntegra para habilitar futuras modelagens analíticas (Cloud Data Analytics).
 
 ---
 
-## Início rápido — sem Docker
+## 🏗️ Arquitetura da Solução
 
-### Backend
+A engenharia da aplicação foi estruturada no modelo de **Monorepo** com arquitetura desacoplada, dividindo as camadas de apresentação, computação e persistência em provedores de nuvem especializados (*Free Tier Optimization*).
 
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-
-# Configure o banco
-export DATABASE_URL="postgresql://user:pass@localhost:5432/weekplanner"
-# OU use SQLite para testes rápidos (edite main.py linha DATABASE_URL)
-
-uvicorn main:app --reload --port 8000
-```
-
-### Banco (PostgreSQL)
-
-```bash
-psql -U postgres
-CREATE DATABASE weekplanner;
-\c weekplanner
-\i database/schema.sql
-```
-
-### Frontend
-
-```bash
-# Modo mock (sem backend) — apenas abra no browser
-open frontend/index.html
-
-# Com backend real — edite script.js:
-# const USE_MOCK = false;
-# const API_BASE = 'http://localhost:8000';
-
-# Ou sirva com qualquer servidor estático:
-cd frontend && python -m http.server 3000
-```
-
----
-
-## Estrutura do Projeto
-
-```
-weekplanner/
-├── database/
-│   └── schema.sql          # DDL + seed data
-├── backend/
-│   ├── main.py             # FastAPI + SQLAlchemy
-│   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/
-│   ├── index.html          # Estrutura semântica
-│   ├── style.css           # CSS Grid + design system
-│   └── script.js           # Vanilla JS (mock + fetch)
-├── docker/
-│   └── nginx.conf          # Reverse proxy
-└── docker-compose.yml
-```
-
----
-
-## Endpoints da API
-
-| Método | Rota             | Descrição                        |
-|--------|------------------|----------------------------------|
-| GET    | /users           | Lista todos os membros           |
-| POST   | /users           | Cria um novo membro              |
-| GET    | /tasks           | Lista tarefas (com filtros)      |
-| POST   | /tasks           | Cria nova tarefa                 |
-| GET    | /tasks/{id}      | Detalhe de uma tarefa            |
-| PUT    | /tasks/{id}      | Atualiza tarefa ou status        |
-| DELETE | /tasks/{id}      | Remove uma tarefa                |
-
-**Filtros disponíveis em GET /tasks:**
-```
-?dia=1&turno=manha&status=a_fazer&user_id=2
-```
-
----
-
-## Modelo de Dados
-
-```
-users: id, nome, email, avatar, cor, criado_em
-tasks: id, titulo, descricao, dia_da_semana (1-7),
-       turno (manha|tarde|noite),
-       status (a_fazer|em_andamento|concluido),
-       user_id, criado_em, atualizado_em
-```
-
----
-
-## Para deploy em AWS EC2
-
-```bash
-# Na instância
-sudo apt update && sudo apt install docker.io docker-compose -y
-git clone <repo> && cd weekplanner
-
-# Edite as variáveis de ambiente em docker-compose.yml
-docker compose up -d
-
-# Configure Security Groups para liberar portas 80 e 443
-```
-
+```text
+       [ Engenheiro / Topógrafo no Campo ]
+                       │
+                       ▼
+       [ Portal Web (Frontend) ] ────────► Hospedado na Vercel
+                       │ (HTTP Requests JSON)
+                       ▼
+ ┌─────────────────────────────────────────────────────────┐
+ │                     Nuvem Serverless                    │
+ │                                                         │
+ │  [ API REST Backend ] ◄──────── Hospedado no Render     │
+ │                       │         (Engine Python/FastAPI) │
+ │                       │ (ORM / SQLAlchemy)              │
+ │                       ▼                                 │
+ │  [ Banco de Dados ]   ◄──────── Hospedado no Neon.tech  │
+ │                                 (PostgreSQL 18)         │
+ └─────────────────────────────────────────────────────────┘
