@@ -137,3 +137,4 @@ docker compose up -d
 
 # Configure Security Groups para liberar portas 80 e 443
 ```
+
